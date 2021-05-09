@@ -1,4 +1,4 @@
-"""This module provides the RP Tree CLI."""
+"""This module provides the Arbre CLI."""
 # cli.py
 
 import argparse
@@ -8,7 +8,7 @@ from colorama import init as colorama_init
 from colorama import Fore
 
 from . import __version__
-from .rptree import DirectoryTree
+from .arbre import DirectoryTree
 
 def main():
     colorama_init(autoreset=True)
@@ -28,10 +28,10 @@ def main():
 def parse_cmd_line_arguments():
     parser = argparse.ArgumentParser(
         prog="tree",
-        description="RP Tree, a directory tree generator",
-        epilog="Thanks for using RP Tree!",
+        description="Arbre, a directory tree generator",
+        epilog="Thanks for using Arbre!",
     )
-    parser.version = f"RP Tree v{__version__}"
+    parser.version = f"Arbre v{__version__}"
     parser.add_argument("-v", "--version", action="version")
     parser.add_argument(
         "root_dir",

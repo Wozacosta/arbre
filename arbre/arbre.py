@@ -1,4 +1,4 @@
-"""This module provides RP Tree main module."""
+"""This module provides Arbre main module."""
 
 import os
 import sys
