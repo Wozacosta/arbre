@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="arbre",
     version="0.1.0",
-    description="Improved cli tre program",
+    description="Improved cli tree program",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/wozacosta/arbre",
