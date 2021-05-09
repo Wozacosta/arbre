@@ -17,7 +17,8 @@ def main():
     tree = DirectoryTree(
         root_dir,
         dir_only=args.dir_only,
-        output_file=args.output_file
+        output_file=args.output_file,
+        show_hidden=args.all,
     )
     tree.generate()
 
@@ -49,6 +50,12 @@ def parse_cmd_line_arguments():
         nargs="?",
         default=sys.stdout,
         help="Generate a full directory tree and save it to a file",
+    )
+    parser.add_argument(
+        "-a",
+        "--all",
+        action="store_true",
+        help="Show all files (including hidden ones)",
     )
     return parser.parse_args()
 

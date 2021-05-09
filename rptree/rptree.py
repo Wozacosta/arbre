@@ -11,9 +11,10 @@ PIPE_PREFIX = "│   "
 SPACE_PREFIX = "    "
 
 class _TreeGenerator:
-    def __init__(self, root_dir, dir_only=False):
+    def __init__(self, root_dir, dir_only=False, show_hidden=False):
         self._root_dir = pathlib.Path(root_dir)
         self._dir_only = dir_only
+        self._show_hidden = show_hidden
         self._tree = []
 
     def build_tree(self):
@@ -35,6 +36,7 @@ class _TreeGenerator:
                     entry, index, entries_count, prefix, connector
                 )
             else:
+
                 self._add_file(entry, prefix, connector)
 
     def _prepare_entries(self, directory):
@@ -43,6 +45,9 @@ class _TreeGenerator:
             entries = [entry for entry in entries if entry.is_dir()]
             return entries
         entries = sorted(entries, key=lambda entry: entry.is_file())
+        if not self._show_hidden:
+            entries = [entry for entry in entries
+                       if not entry.name.startswith(".")]
         return entries
 
 
@@ -70,9 +75,15 @@ class _TreeGenerator:
 
 
 class DirectoryTree:
-    def __init__(self, root_dir, dir_only=False, output_file=sys.stdout):
+    def __init__(
+        self,
+        root_dir,
+        dir_only=False,
+        output_file=sys.stdout,
+        show_hidden=False,
+    ):
         self._output_file = output_file
-        self._generator = _TreeGenerator(root_dir, dir_only)
+        self._generator = _TreeGenerator(root_dir, dir_only, show_hidden)
 
     def generate(self):
         tree = self._generator.build_tree()
