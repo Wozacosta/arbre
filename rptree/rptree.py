@@ -3,12 +3,30 @@
 import os
 import sys
 import pathlib
+from dataclasses import dataclass
+from enum import Enum
+from colorama import Fore, Back, Style
 
 PIPE = "│"
 ELBOW = "└──"
 TEE = "├──"
 PIPE_PREFIX = "│   "
 SPACE_PREFIX = "    "
+
+class EntryType(Enum):
+    BRANCH = 0
+    FILE = 1
+    FOLDER = 2
+    MARKDOWN = 3
+
+
+@dataclass
+class Entry:
+    type: EntryType
+    text: str = ''
+    prefix: str = ''
+    connector: str = ''# todo: could make Enum
+
 
 class _TreeGenerator:
     def __init__(self, root_dir, dir_only=False, show_hidden=False):
@@ -23,8 +41,18 @@ class _TreeGenerator:
         return self._tree
 
     def _tree_head(self):
-        self._tree.append(f"{self._root_dir}{os.sep}")
-        self._tree.append(PIPE)
+        self._tree.append(
+            Entry(
+                text=f"{self._root_dir}{os.sep}",
+                type=EntryType.FOLDER,
+            )
+        )
+        self._tree.append(
+            Entry(
+                text=PIPE,
+                type=EntryType.BRANCH,
+            )
+        )
 
     def _tree_body(self, directory, prefix=""):
         entries = self._prepare_entries(directory)
@@ -57,7 +85,15 @@ class _TreeGenerator:
                        index,
                        entries_count,
                        prefix, connector):
-        self._tree.append(f"{prefix}{connector} {directory.name}{os.sep}")
+        self._tree.append(
+            Entry(
+                # text=f"{prefix}{connector} {directory.name}{os.sep}",
+                text=f"{directory.name}{os.sep}",
+                type=EntryType.FOLDER,
+                prefix=prefix,
+                connector=connector
+            )
+        )
         if index != entries_count - 1:
             prefix += PIPE_PREFIX
         else:
@@ -66,11 +102,24 @@ class _TreeGenerator:
             directory=directory,
             prefix=prefix,
         )
-        self._tree.append(prefix.rstrip())
+        self._tree.append(
+            Entry(
+                type=EntryType.BRANCH,
+                prefix=prefix.rstrip(),
+            )
+        )
 
 
     def _add_file(self, file, prefix, connector):
-        self._tree.append(f"{prefix}{connector} {file.name}")
+        # self._tree.append(f"{prefix}{connector} {file.name}")
+        self._tree.append(
+            Entry(
+                type=EntryType.FILE,
+                text=file.name,
+                prefix=prefix,
+                connector=connector,
+            )
+        )
 
 
 
@@ -90,11 +139,28 @@ class DirectoryTree:
         if self._output_file != sys.stdout:
             # Wrap the tree in a markdown code block
             # TODO: use collections.deque and .appendleft()
-            tree.insert(0, "```")
-            tree.append("```")
+            tree.insert(0,
+                Entry(
+                    type=EntryType.MARKDOWN,
+                    text="```"
+                )
+            )
+            tree.append(
+                Entry(
+                    type=EntryType.MARKDOWN,
+                    text="```"
+                )
+            )
             self._output_file = open(
                 self._output_file, mode="w", encoding="UTF-8"
             )
         with self._output_file as stream:
             for entry in tree:
-                print(entry, file=stream)
+                color_prefix = ''
+                if entry.type == EntryType.FOLDER:
+                    color_prefix = Fore.BLUE
+                text = f"{entry.prefix}{entry.connector}"
+                if len(text) > 1 and len(entry.text) > 1:
+                    text = f"{text} "
+                text = f"{text}{color_prefix}{entry.text}{Style.RESET_ALL}"
+                print(f"{text}", file=stream)

@@ -4,15 +4,18 @@
 import argparse
 import pathlib
 import sys
+from colorama import init as colorama_init
+from colorama import Fore
 
 from . import __version__
 from .rptree import DirectoryTree
 
 def main():
+    colorama_init(autoreset=True)
     args = parse_cmd_line_arguments()
     root_dir = pathlib.Path(args.root_dir)
     if not root_dir.is_dir():
-        print("The specified root directory doesn't exist")
+        print(Fore.RED + "The specified root directory doesn't exist")
         sys.exit()
     tree = DirectoryTree(
         root_dir,
