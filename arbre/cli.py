@@ -27,9 +27,9 @@ def main():
 
 def parse_cmd_line_arguments():
     parser = argparse.ArgumentParser(
-        prog="tree",
+        prog="arbre",
         description="Arbre, a directory tree generator",
-        epilog="Thanks for using Arbre!",
+        epilog="Thanks for using arbre!",
     )
     parser.version = f"Arbre v{__version__}"
     parser.add_argument("-v", "--version", action="version")
